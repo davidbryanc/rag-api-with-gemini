@@ -131,10 +131,8 @@ The final, deployable application resides in the `app/` directory, reflecting a 
 │   └── routers/
 │       ├── __init__.py
 │       └── rag.py        # APIRouter for the RAG service logic
-└── _practice_scripts/    # (Recommended) Folder for all daily practice scripts
+└── _practice_scripts/   
     ├── embedding_practice.py
     ├── chroma_practice.py
     └── ...
 ```
-
-**Note:** It is recommended to move all the individual practice scripts (`embedding_practice.py`, `langchain_rag.py`, etc.) into a separate folder like `_practice_scripts/` to keep the root directory clean.
