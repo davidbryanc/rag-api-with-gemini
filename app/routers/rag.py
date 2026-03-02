@@ -14,6 +14,9 @@ from langchain_core.output_parsers import StrOutputParser
 
 from ..models.rag_models import QueryRequest, QueryResponse
 
+from fastapi.responses import StreamingResponse
+import asyncio
+
 # --- Setup Awal ---
 # Kita pindahkan logika setup ke sini.
 # Dalam aplikasi produksi, ini sering dilakukan di tempat lain (misal, startup event).
@@ -72,3 +75,20 @@ def ask_question(request: QueryRequest) -> QueryResponse:
     # Kembalikan jawaban dalam format Pydantic model QueryResponse
     return QueryResponse(answer=answer_text)
 
+# Buat endpoint baru untuk streaming
+@router.post("/ask-stream")
+async def ask_question_stream(request: QueryRequest):
+    """
+    Menerima pertanyaan dan mengembalikan jawabannya sebagai aliran (stream) teks.
+    """
+    # Definisikan sebuah generator asinkron
+    async def event_generator():
+        # Gunakan .astream() untuk mendapatkan generator asinkron
+        async for chunk in rag_chain.astream(request.question):
+            # yield setiap potongan teks saat tiba
+            yield chunk
+            # Jeda kecil agar streaming terlihat lebih mulus (opsional)
+            await asyncio.sleep(0.01)
+
+    # Kembalikan generator di dalam StreamingResponse
+    return StreamingResponse(event_generator(), media_type="text/plain")
